@@ -1,8 +1,11 @@
 import { useLanguage } from "@/lib/language-context"
 import { useMemo } from "react"
 
+// Type pour les messages de traduction
+type Messages = Record<string, any>
+
 // Import dynamique des traductions
-const translations = {
+const translations: Record<string, () => Promise<Messages>> = {
   fr: () => import("@/messages/fr.json").then(module => module.default),
   en: () => import("@/messages/en.json").then(module => module.default),
 }
@@ -52,7 +55,7 @@ export function useTranslationSection(section: string) {
   const sectionTranslations = useMemo(async () => {
     try {
       const messages = await translations[language]()
-      return messages[section] || {}
+      return (messages as any)[section] || {}
     } catch (error) {
       console.error("Error loading translation section:", error)
       return {}
@@ -61,4 +64,3 @@ export function useTranslationSection(section: string) {
 
   return sectionTranslations
 }
-
