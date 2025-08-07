@@ -5,17 +5,20 @@ import { useState, useEffect } from "react"
 import frMessages from "@/messages/fr.json"
 import enMessages from "@/messages/en.json"
 
-const messages = {
+// Type pour les messages de traduction
+type Messages = Record<string, any>
+
+const messages: Record<string, Messages> = {
   fr: frMessages,
   en: enMessages,
 }
 
 export function useTranslationsSync() {
   const { language } = useLanguage()
-  const [currentMessages, setCurrentMessages] = useState(messages.fr)
+  const [currentMessages, setCurrentMessages] = useState<Messages>(messages.fr)
 
   useEffect(() => {
-    setCurrentMessages(messages[language])
+    setCurrentMessages(messages[language] || messages.fr)
   }, [language])
 
   const t = (key: string): string => {
@@ -43,10 +46,9 @@ export function useTranslationSectionSync(section: string) {
   const [sectionMessages, setSectionMessages] = useState<any>({})
 
   useEffect(() => {
-    const messages = language === "fr" ? frMessages : enMessages
-    setSectionMessages(messages[section] || {})
+    const currentMessages = (language === "fr" ? frMessages : enMessages) as Messages
+    setSectionMessages((currentMessages as any)[section] || {})
   }, [language, section])
 
   return sectionMessages
 }
-
